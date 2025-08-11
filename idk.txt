@@ -1,6 +1,13 @@
 Vocoder tag made by TVME3842 {sh:
-load {av}
-load {arg:0}
+load {iscripturl:load {av} d
+convert d audio/wav
+render d}
+load {iscripturl:load {av} d
+load {arg:0} a
+get d duration dur
+repeatduration a dur
+convert a audio/wav
+render a}
 load https://github.com/Beebo72/arrs_files_build/raw/refs/heads/main/arss.exe
 load https://github.com/Beebo72/arrs_files_build/raw/refs/heads/main/fftw3.dll
 
@@ -16,10 +23,9 @@ MOD_BMP="modulator.bmp"
 CAR_BMP="carrier.bmp"
 COMBINED_BMP="combined.bmp"
 VOCODED_WAV="vocoded.wav"
-dur1=$(ffprobe -i $FILE_1 -v error -show_entries format=duration -of csv=p=0)
 
 ffmpeg -y -i $FILE_1 -c copy -bitexact -map_metadata -1 mod_clean.wav -loglevel quiet
-ffmpeg -y -stream_loop -1 -i $FILE_2 -t $dur1 -c copy -bitexact -map_metadata -1 car_clean.wav -loglevel quiet
+ffmpeg -y -i $FILE_2 -c copy -bitexact -map_metadata -1 car_clean.wav -loglevel quiet
 
 mv -f mod_clean.wav "$MOD_WAV"
 mv -f car_clean.wav "$CAR_WAV"
