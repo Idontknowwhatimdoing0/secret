@@ -1,0 +1,40 @@
+Vocoder tag made by TVME3842 {sh:
+load {iscripturl:load {av} d
+convert d audio/wav
+render d}
+load {iscripturl:load {av} d
+load {arg:0} a
+get d duration dur
+repeatduration a dur
+convert a audio/wav
+render a}
+load https://github.com/Beebo72/arrs_files_build/raw/refs/heads/main/arss.exe
+load https://github.com/Beebo72/arrs_files_build/raw/refs/heads/main/fftw3.dll
+
+MINF="27.5"
+MAXF="20000"
+BANDS="30"
+PPS="100"
+G="25"
+
+MOD_WAV="modulator.wav"
+CAR_WAV="carrier.wav"
+MOD_BMP="modulator.bmp"
+CAR_BMP="carrier.bmp"
+COMBINED_BMP="combined.bmp"
+VOCODED_WAV="vocoded.wav"
+
+ffmpeg -y -i $FILE_1 -c copy -bitexact -map_metadata -1 mod_clean.wav -loglevel quiet
+ffmpeg -y -i $FILE_2 -c copy -bitexact -map_metadata -1 car_clean.wav -loglevel quiet
+
+mv -f mod_clean.wav "$MOD_WAV"
+mv -f car_clean.wav "$CAR_WAV"
+
+wine ./input/arss.exe -q "$MOD_WAV" "$MOD_BMP" --min-freq $MINF --max $MAXF -b $BANDS -p $PPS -g $G >/dev/null 2>&1
+wine ./input/arss.exe -q "$CAR_WAV" "$CAR_BMP" --min-freq $MINF --max $MAXF -b $BANDS -p $PPS -g $G >/dev/null 2>&1
+
+magick convert "$MOD_BMP" -colorspace Gray mod_gray.bmp >/dev/null 2>&1
+magick convert "$CAR_BMP" -colorspace Gray car_gray.bmp >/dev/null 2>&1
+magick convert car_gray.bmp mod_gray.bmp -compose Multiply -composite "$COMBINED_BMP" >/dev/null 2>&1
+
+wine ./input/arss.exe -q "$COMBINED_BMP" ./output/vocoded.wav --sine --min-freq $MINF --max $MAXF --pps $PPS -r 44100 -f 16 -g $G >/dev/null 2>&1}
